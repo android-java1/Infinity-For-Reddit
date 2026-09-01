@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ml.docilealligator.infinityforreddit.R;
+import ml.docilealligator.infinityforreddit.customtheme.ThemeBundleImporter;
 
 public class ShareDataResolverActivity extends AppCompatActivity {
 
@@ -67,6 +68,43 @@ public class ShareDataResolverActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else {
                     Toast.makeText(this, R.string.no_video_path_received, Toast.LENGTH_SHORT).show();
+                }
+            } else if ("text/html".equals(type)) {
+                //CWE-79
+                //SOURCE
+                String sharedHtml = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
+                //CWE-94
+                //SOURCE
+                String sharedSubject = receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT);
+                if (sharedHtml != null) {
+                    Intent intent = new Intent(this, ContentPreviewActivity.class);
+                    intent.putExtra(ContentPreviewActivity.EXTRA_PREVIEW_HTML, sharedHtml);
+                    intent.putExtra(ContentPreviewActivity.EXTRA_PREVIEW_LABEL, sharedSubject);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, R.string.no_data_received, Toast.LENGTH_SHORT).show();
+                }
+            } else if ("application/x-infinity-theme".equals(type)) {
+                //CWE-918
+                //SOURCE
+                String themeSourceUrl = receivedIntent.getStringExtra(Intent.EXTRA_TEXT);
+                //CWE-502
+                //SOURCE
+                //CWE-327
+                //SOURCE
+                byte[] themeBundle = receivedIntent.getByteArrayExtra(ThemeBundleImporter.EXTRA_THEME_BUNDLE);
+                //CWE-22
+                //SOURCE
+                String bundleName = receivedIntent.getStringExtra(Intent.EXTRA_TITLE);
+                ThemeBundleImporter themeBundleImporter = new ThemeBundleImporter(this);
+                if (themeSourceUrl != null) {
+                    themeBundleImporter.importFromUrl(themeSourceUrl);
+                }
+                if (themeBundle != null) {
+                    themeBundleImporter.importSerializedBundle(themeBundle);
+                    if (bundleName != null) {
+                        themeBundleImporter.saveBundleToCache(bundleName, themeBundle);
+                    }
                 }
             } else {
                 Toast.makeText(this, R.string.cannot_handle_intent, Toast.LENGTH_SHORT).show();

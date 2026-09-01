@@ -7,7 +7,14 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -71,7 +78,46 @@ abstract class NetworkModule {
             }
         }
 
+        if (proxyEnabled && mProxySharedPreferences.getBoolean(SharedPreferencesUtils.PROXY_ALLOW_SELF_SIGNED_CERTIFICATES, false)) {
+            applyPermissiveTrustForProxy(builder);
+        }
+
         return builder.build();
+    }
+
+    /**
+     * Allows the base client to negotiate TLS with a locally configured proxy that
+     * presents a self-signed certificate, when the user has explicitly enabled it.
+     *
+     * @param builder the client builder to configure
+     */
+    private static void applyPermissiveTrustForProxy(OkHttpClient.Builder builder) {
+        try {
+            TrustManager[] trustManagers = new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                        }
+
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                        }
+
+                        @Override
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
+                    }
+            };
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            //CWE-295
+            //SINK
+            sslContext.init(null, trustManagers, new SecureRandom());
+            builder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustManagers[0]);
+            builder.hostnameVerifier((hostname, session) -> true);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     @Provides
