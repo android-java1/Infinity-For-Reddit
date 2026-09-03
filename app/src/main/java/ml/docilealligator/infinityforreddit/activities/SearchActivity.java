@@ -285,6 +285,8 @@ public class SearchActivity extends BaseActivity {
         binding.searchEditTextSearchActivity.setOnEditorActionListener((v, actionId, event) -> {
             if ((actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) || (event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 if (!binding.searchEditTextSearchActivity.getText().toString().isEmpty()) {
+                    //CWE-89
+                    //SOURCE
                     search(binding.searchEditTextSearchActivity.getText().toString());
                     return true;
                 }
@@ -462,6 +464,9 @@ public class SearchActivity extends BaseActivity {
     }
 
     private void search(String query) {
+        if (mRecentSearchQueryViewModel != null) {
+            mRecentSearchQueryViewModel.findMatchingRecentSearches(getApplicationContext(), query);
+        }
         if (query.equalsIgnoreCase("suicide") && mSharedPreferences.getBoolean(SharedPreferencesUtils.SHOW_SUICIDE_PREVENTION_ACTIVITY, true)) {
             Intent intent = new Intent(this, SuicidePreventionActivity.class);
             intent.putExtra(SuicidePreventionActivity.EXTRA_QUERY, query);

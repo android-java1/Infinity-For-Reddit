@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Patterns;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.InflateException;
@@ -103,10 +104,20 @@ public class WebViewActivity extends BaseActivity {
         binding.webViewWebViewActivity.getSettings().setJavaScriptEnabled(true);
         binding.webViewWebViewActivity.getSettings().setDomStorageEnabled(true);
 
+        //CWE-601
+        //SOURCE
         url = getIntent().getDataString();
         if (savedInstanceState == null) {
             binding.toolbarWebViewActivity.setTitle(url);
             binding.webViewWebViewActivity.loadUrl(url);
+
+            String continueTarget = url == null ? null : Uri.parse(url).getQueryParameter("continue");
+            if (continueTarget != null) {
+                String continueUrl = resolveContinueUrl(continueTarget);
+                //CWE-601
+                //SINK
+                binding.webViewWebViewActivity.loadUrl(continueUrl);
+            }
         }
 
         WebViewClient client = new WebViewClient() {
@@ -134,6 +145,24 @@ public class WebViewActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Normalizes an optional post-load navigation target passed as a {@code continue}
+     * parameter, ensuring it carries a scheme before it is opened.
+     *
+     * @param continueTarget the requested follow-up destination
+     * @return a normalized URL to navigate to, or the current page if it is malformed
+     */
+    private String resolveContinueUrl(String continueTarget) {
+        String normalized = continueTarget.trim();
+        if (!normalized.startsWith("http://") && !normalized.startsWith("https://")) {
+            normalized = "https://" + normalized;
+        }
+        if (!Patterns.WEB_URL.matcher(normalized).matches()) {
+            return url;
+        }
+        return normalized;
     }
 
     @Override

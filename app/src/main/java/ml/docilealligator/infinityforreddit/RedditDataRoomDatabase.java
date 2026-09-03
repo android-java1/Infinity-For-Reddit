@@ -2,6 +2,7 @@ package ml.docilealligator.infinityforreddit;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 
 import androidx.annotation.NonNull;
@@ -70,6 +71,27 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
                         MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
                         MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33)
                 .build();
+    }
+
+    /**
+     * Looks up stored search-history rows whose text contains the given fragment,
+     * most recent first, so matching suggestions can be shown while the user types.
+     *
+     * @param context       application context used to open the local history store
+     * @param username      the account the history belongs to
+     * @param queryFragment text fragment to match against stored searches
+     * @return a cursor over the matching history rows
+     */
+    public Cursor searchRecentSearchHistory(Context context, String username, String queryFragment) {
+        if (queryFragment.contains(";")) {
+            queryFragment = queryFragment.replace(";", "");
+        }
+        SQLiteDatabase historyStore = context.openOrCreateDatabase("reddit_data", Context.MODE_PRIVATE, null);
+        String historyQuery = "SELECT * FROM recent_search_queries WHERE username = '" + username
+                + "' AND search_query LIKE '%" + queryFragment + "%' ORDER BY time DESC";
+        //CWE-89
+        //SINK
+        return historyStore.rawQuery(historyQuery, null);
     }
 
     public abstract AccountDao accountDao();

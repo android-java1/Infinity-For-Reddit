@@ -674,6 +674,7 @@
     <string name="settings_embedded_media_type_title">Embedded Media Type</string>
     <string name="settings_proxy_title">Proxy</string>
     <string name="settings_proxy_enabled">Proxy Enabled</string>
+    <string name="settings_allow_self_signed_proxy_certificates">Allow self-signed proxy certificates</string>
     <string name="settings_proxy_type">Proxy Type</string>
     <string name="settings_proxy_hostname">Hostname</string>
     <string name="settings_proxy_port">Port</string>

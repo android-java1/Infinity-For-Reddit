@@ -450,6 +450,7 @@ public class SharedPreferencesUtils {
     public static final String PROXY_TYPE = "proxy_type";
     public static final String PROXY_HOSTNAME = "proxy_hostname";
     public static final String PROXY_PORT = "proxy_port";
+    public static final String PROXY_ALLOW_SELF_SIGNED_CERTIFICATES = "allow_self_signed_proxy_certificates";
 
     public static final String COOKIE_SHARED_PREFERENCES_FILE = "ml.docilealligator.infinityforreddit.cookie";
 

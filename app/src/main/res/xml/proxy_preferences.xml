@@ -7,6 +7,12 @@
         app:title="@string/settings_proxy_enabled"
         app:summary="@string/restart_app_see_changes" />
 
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="false"
+        app:key="allow_self_signed_proxy_certificates"
+        app:title="@string/settings_allow_self_signed_proxy_certificates"
+        app:summary="@string/restart_app_see_changes" />
+
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
         app:defaultValue="HTTP"
         app:entries="@array/settings_proxy_type"

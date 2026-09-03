@@ -286,7 +286,25 @@
 
                 <data android:mimeType="text/plain" />
             </intent-filter>
+            <intent-filter android:label="@string/submit_post">
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/html" />
+            </intent-filter>
+            <intent-filter android:label="@string/submit_post">
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/x-infinity-theme" />
+            </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.ContentPreviewActivity"
+            android:exported="false"
+            android:label="@string/submit_post" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/settings_activity_label"
